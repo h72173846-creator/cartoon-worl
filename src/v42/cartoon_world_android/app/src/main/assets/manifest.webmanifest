@@ -1,0 +1,12 @@
+{
+  "name": "عالم الكرتون",
+  "short_name": "عالم الكرتون",
+  "description": "مكتبتك الشخصية للكرتون والأنمي",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b0814",
+  "theme_color": "#0b0814",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

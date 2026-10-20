@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0b0814">
+<meta name="description" content="عالم الكرتون 4.2 — مكتبتك الشخصية للكرتون والأنمي على جهازك">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>عالم الكرتون 4.2</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b0814;
+  --bg2:#120e1f;
+  --panel:#1a1429;
+  --panel2:#241b36;
+  --line:#3a2f52;
+  --text:#f8f4ff;
+  --muted:#a99bbf;
+  --gold:#ffd166;
+  --pink:#ff6b9d;
+  --cyan:#6ee7d0;
+  --green:#5dd9a0;
+  --danger:#ff7b86;
+  --shadow:0 10px 28px #00000055;
+  --radius:18px;
+  --nav-h:64px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column}
+button,input,select,textarea{font:inherit;color:inherit}
+button{border:0;cursor:pointer;background:none}
+.app{flex:1;display:flex;flex-direction:column;min-height:0;position:relative}
+
+/* Header */
+.header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#120e1fee,#0b0814cc);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top))}
+.header-inner{display:flex;align-items:center;gap:10px;max-width:720px;margin:0 auto}
+.logo{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--gold),var(--pink));display:grid;place-items:center;font-size:18px;color:#2a1030;font-weight:900;flex-shrink:0;box-shadow:0 4px 16px #ff6b9d33}
+.header h1{font-size:17px;margin:0;line-height:1.15}
+.header small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.header-actions{margin-right:auto;display:flex;gap:6px}
+.icon-btn{width:38px;height:38px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;font-size:16px}
+
+/* Content */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:12px 14px;padding-bottom:calc(var(--nav-h) + var(--safe-b) + 18px);max-width:720px;margin:0 auto;width:100%}
+.page{display:none;animation:fadeIn .22s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;padding:20px;border-radius:22px;background:linear-gradient(125deg,#3d2468 0%,#8c3470 55%,#c04e6e 100%);margin-bottom:16px;box-shadow:var(--shadow)}
+.hero::after{content:"✦";position:absolute;left:12px;top:6px;font-size:70px;opacity:.12;transform:rotate(15deg)}
+.hero .eyebrow{font-size:12px;opacity:.9;margin-bottom:6px}
+.hero h2{margin:0 0 6px;font-size:20px}
+.hero p{margin:0 0 14px;font-size:13px;opacity:.92;line-height:1.45}
+.hero-actions{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:14px;background:linear-gradient(135deg,var(--gold),#ffb347);color:#2a1808;font-weight:800;font-size:13px;border:0;box-shadow:0 4px 14px #ffd16644}
+.btn.alt{background:var(--panel2);color:var(--text);border:1px solid var(--line);box-shadow:none}
+.btn.pink{background:linear-gradient(135deg,var(--pink),#ff3d7a);color:#fff}
+.btn.danger{background:linear-gradient(135deg,#ff5c6c,#e03a4a);color:#fff}
+.btn.small{padding:7px 12px;font-size:12px;border-radius:11px}
+.btn:active{transform:scale(.97)}
+
+/* Search & chips */
+.search-row{display:flex;gap:8px;margin-bottom:12px}
+.search-row input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 14px;color:var(--text);outline:none}
+.search-row input:focus{border-color:var(--pink)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.chip{padding:7px 13px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--muted)}
+.chip.active{background:linear-gradient(135deg,var(--pink),#c93d7a);color:#fff;border-color:transparent}
+
+/* Section */
+.section{margin-bottom:18px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section-head h3{margin:0;font-size:15px}
+.count{font-size:12px;color:var(--muted);background:var(--panel);padding:3px 9px;border-radius:999px}
+
+/* Cards grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;position:relative;transition:transform .15s}
+.card:active{transform:scale(.98)}
+.card-banner{height:72px;display:flex;align-items:center;justify-content:center;font-size:32px;position:relative}
+.card-body{padding:10px}
+.card-body h4{margin:0 0 3px;font-size:13px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-body p{margin:0;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-actions{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.fav-btn{position:absolute;top:7px;left:7px;width:30px;height:30px;border-radius:50%;background:#0006;display:grid;place-items:center;font-size:14px;z-index:2}
+.fav-btn.on{color:var(--gold)}
+.lang-badge{position:absolute;bottom:6px;right:6px;font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px;background:#000a;color:#fff;letter-spacing:.3px}
+.lang-badge.dub{background:#0a7a4aaa;color:#a8f0c8}
+.lang-badge.sub{background:#5a3a8aaa;color:#d4c0ff}
+
+/* Progress bar on cards */
+.prog{height:3px;background:#ffffff18;border-radius:2px;margin-top:7px;overflow:hidden}
+.prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:2px}
+
+/* List items (library) */
+.list{display:flex;flex-direction:column;gap:8px}
+.list-item{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px}
+.list-item .emoji{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.list-item .meta{flex:1;min-width:0}
+.list-item .meta h4{margin:0 0 2px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item .meta p{margin:0;font-size:11px;color:var(--muted)}
+.list-item .actions{display:flex;gap:5px;flex-shrink:0}
+
+/* Panel */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.panel h3{margin:0 0 8px;font-size:14px}
+.panel p{margin:0 0 10px;font-size:13px;color:var(--muted);line-height:1.45}
+.form-row{margin-bottom:10px}
+.form-row label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.form-row input,.form-row select,.form-row textarea{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--text);outline:none}
+.form-row input:focus,.form-row select:focus{border-color:var(--pink)}
+.hint{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+.stat-card .num{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-card .lbl{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* Empty */
+.empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
+.empty .big{font-size:36px;margin-bottom:8px}
+
+/* Bottom Nav */
+.nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-b));padding-bottom:var(--safe-b);background:linear-gradient(0deg,#150f22f5,#0f0b18ee);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;z-index:30;max-width:720px;margin:0 auto}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;color:var(--muted);font-weight:600;padding-top:6px}
+.nav-item .ico{font-size:20px;line-height:1}
+.nav-item.active{color:var(--gold)}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:50;background:#000a;display:none;align-items:flex-end;justify-content:center;padding:12px;padding-bottom:calc(12px + var(--safe-b))}
+.modal.show{display:flex}
+.modal-sheet{background:var(--panel);border:1px solid var(--line);border-radius:22px 22px 18px 18px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:18px;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.modal-sheet h3{margin:0 0 12px;font-size:16px}
+.modal-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+/* Player */
+.player{position:fixed;inset:0;z-index:60;background:#000;display:none;flex-direction:column}
+.player.show{display:flex}
+.player-top{display:flex;align-items:center;gap:10px;padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top));background:linear-gradient(#000c,#0000);position:absolute;top:0;left:0;right:0;z-index:2}
+.player-top button{width:36px;height:36px;border-radius:50%;background:#fff2;display:grid;place-items:center;font-size:16px}
+.player-top .title{flex:1;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player video{flex:1;width:100%;height:100%;background:#000;object-fit:contain}
+
+/* Mini Player */
+.mini-player{
+  position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 8px);left:10px;right:10px;
+  z-index:55;display:none;align-items:center;gap:10px;
+  background:linear-gradient(135deg,#1e1630ee,#2a1d40f2);border:1px solid var(--line);
+  border-radius:16px;padding:8px 10px;box-shadow:0 8px 28px #0008;
+  backdrop-filter:blur(12px);max-width:500px;margin:0 auto;
+}
+.mini-player.show{display:flex;animation:slideUpMini .25s ease}
+@keyframes slideUpMini{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.mini-player video{
+  width:64px;height:40px;border-radius:8px;object-fit:cover;background:#000;flex-shrink:0;
+}
+.mini-player .mini-info{flex:1;min-width:0}
+.mini-player .mini-info h4{margin:0;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-player .mini-info p{margin:2px 0 0;font-size:10px;color:var(--muted)}
+.mini-player .mini-actions{display:flex;gap:6px;flex-shrink:0}
+.mini-player .mini-actions button{
+  width:34px;height:34px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:14px;color:var(--text)
+}
+.mini-player .mini-actions button.play-btn{background:linear-gradient(135deg,var(--gold),#ffb347);color:#2a1808;border:0}
+
+
+/* Toast */
+.toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 16px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:10px 18px;border-radius:14px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:90%;text-align:center;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Notice */
+.notice{font-size:11px;color:var(--muted);line-height:1.5;padding:10px 12px;background:#ffffff06;border-radius:12px;border:1px dashed var(--line);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">▶</div>
+      <div>
+        <h1>عالم الكرتون</h1>
+        <small id="headerSub">نسخة 4.2 • مع مشغل مصغّر</small>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openAddTitle()" title="إضافة عنوان">＋</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content" id="content">
+    <!-- HOME -->
+    <section id="page-home" class="page active">
+      <div class="hero">
+        <div class="eyebrow">✨ مكتبتك على جهازك</div>
+        <h2>كل حلقاتك في مكان واحد</h2>
+        <p>استورد ملفاتك، تابع من آخر نقطة، وأدر مجموعتك بسهولة — بدون إنترنت بعد التثبيت.</p>
+        <div class="hero-actions">
+          <button class="btn" onclick="goPage('library')">📥 مكتبتي</button>
+          <button class="btn alt" onclick="openAddTitle()">＋ عنوان جديد</button>
+        </div>
+      </div>
+
+      <div class="search-row">
+        <input id="query" type="search" placeholder="ابحث عن عنوان..." autocomplete="off">
+      </div>
+      <div class="chips" id="chips"></div>
+
+      <div class="section" id="continueSection" hidden>
+        <div class="section-head"><h3>▶ كمّل المشاهدة</h3><span class="count" id="continueCount">0</span></div>
+        <div class="grid" id="continueGrid"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3>🎬 العناوين</h3><span class="count" id="catalogCount">0</span></div>
+        <div class="grid" id="catalog"></div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="page-library" class="page">
+      <div class="panel">
+        <h3>استيراد حلقات</h3>
+        <p>اختر العنوان ثم استورد ملفات الفيديو من جهازك. تُحفظ داخل مساحة التطبيق.</p>
+        <div class="form-row">
+          <label for="importTitle">العنوان</label>
+          <select id="importTitle"></select>
+        </div>
+        <button class="btn" onclick="chooseVideos()">＋ استيراد فيديوهات</button>
+        <div class="hint" id="storageState"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <h3>🎞️ الحلقات المحفوظة</h3>
+          <span class="count" id="videoCount">0</span>
+        </div>
+        <div class="search-row">
+          <input id="librarySearch" type="search" placeholder="ابحث باسم الحلقة...">
+        </div>
+        <div class="list" id="videoList"></div>
+      </div>
+    </section>
+
+    <!-- FAVORITES -->
+    <section id="page-favorites" class="page">
+      <div class="section">
+        <div class="section-head"><h3>⭐ المفضلة</h3><span class="count" id="favCount">0</span></div>
+        <div class="grid" id="favGrid"></div>
+      </div>
+    </section>
+
+    <!-- STATS / SETTINGS -->
+    <section id="page-stats" class="page">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="num" id="statTitles">0</div><div class="lbl">عنوان</div></div>
+        <div class="stat-card"><div class="num" id="statVideos">0</div><div class="lbl">حلقة محفوظة</div></div>
+        <div class="stat-card"><div class="num" id="statFavs">0</div><div class="lbl">مفضلة</div></div>
+        <div class="stat-card"><div class="num" id="statWatched">0</div><div class="lbl">دقيقة مشاهدة</div></div>
+      </div>
+
+      <div class="panel">
+        <h3>النسخ الاحتياطي</h3>
+        <p>صدّر العناوين المخصصة والمفضلة كملف JSON، أو استعدها لاحقًا.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn small" onclick="exportBackup()">تصدير نسخة</button>
+          <label class="btn alt small" style="cursor:pointer">استعادة<input type="file" id="backupPicker" accept="application/json,.json" hidden></label>
+        </div>
+        <div class="hint" id="backupState"></div>
+      </div>
+
+      <div class="panel">
+        <h3>حول التطبيق</h3>
+        <p>عالم الكرتون 4.2 — تطبيق شخصي لحفظ ومشاهدة ملفات الكرتون والأنمي التي تملكها على جهازك. لا يحتوي على حلقات جاهزة ولا يتصل بأي موقع.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button class="btn alt small" onclick="shareApp()">مشاركة التطبيق</button>
+          <button class="btn danger small" onclick="clearAllData()">مسح البيانات</button>
+        </div>
+      </div>
+
+      <div class="notice">الملفات المستوردة تُخزَّن داخل مساحة التطبيق. حذف التطبيق أو مسح بياناته يحذفها. احتفظ بنسخ أصلية من ملفاتك.</div>
+    </section>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="nav">
+    <button class="nav-item active" data-page="home" onclick="goPage('home')"><span class="ico">🏠</span>الرئيسية</button>
+    <button class="nav-item" data-page="library" onclick="goPage('library')"><span class="ico">📥</span>مكتبتي</button>
+    <button class="nav-item" data-page="favorites" onclick="goPage('favorites')"><span class="ico">⭐</span>المفضلة</button>
+    <button class="nav-item" data-page="stats" onclick="goPage('stats')"><span class="ico">📊</span>المزيد</button>
+  </nav>
+</div>
+
+<!-- Modal: Add / Edit Title -->
+<div class="modal" id="modal">
+  <div class="modal-sheet">
+    <h3 id="modalTitle">إضافة عنوان</h3>
+    <div class="form-row"><label>الاسم</label><input id="tName" maxlength="70" placeholder="مثال: عالم غامبول"></div>
+    <div class="form-row"><label>الاسم المختصر</label><input id="tShort" maxlength="30" placeholder="غامبول"></div>
+    <div class="form-row"><label>التصنيف</label>
+      <select id="tCat"><option>كوميديا</option><option>أكشن</option><option>كلاسيكي</option><option>مغامرات</option><option>أنمي</option><option>أخرى</option></select>
+    </div>
+    <div class="form-row"><label>إيموجي</label><input id="tEmoji" maxlength="4" placeholder="🎬" value="🎬"></div>
+    <div class="form-row"><label>اللغة</label>
+      <select id="tLang"><option value="مدبلج">مدبلج</option><option value="مترجم">مترجم</option><option value="أصلي">أصلي</option></select>
+    </div>
+    <div class="form-row"><label>وصف قصير</label><input id="tDesc" maxlength="120" placeholder="وصف اختياري"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="saveTitle()">حفظ</button>
+      <button class="btn alt" onclick="closeModal()">إلغاء</button>
+      <button class="btn danger small" id="btnDeleteTitle" hidden onclick="deleteCurrentTitle()">حذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- Video Player -->
+<div class="player" id="player">
+  <div class="player-top">
+    <button onclick="closePlayer()">✕</button>
+    <div class="title" id="playerTitle">جاري التشغيل</div>
+  </div>
+  <video id="video" controls playsinline></video>
+</div>
+
+
+<!-- Mini Player -->
+<div class="mini-player" id="miniPlayer">
+  <video id="miniVideo" muted playsinline></video>
+  <div class="mini-info" onclick="expandPlayer()" style="cursor:pointer">
+    <h4 id="miniTitle">جاري التشغيل</h4>
+    <p id="miniSub">اضغط للتوسيع</p>
+  </div>
+  <div class="mini-actions">
+    <button class="play-btn" id="miniPlayBtn" onclick="toggleMiniPlay()">▶</button>
+    <button onclick="expandPlayer()">⛶</button>
+    <button onclick="closeMiniPlayer()">✕</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const defaults = [
+  {id:'gumball',name:'عالم غامبول المدهش',short:'غامبول',category:'كوميديا',emoji:'🐱',desc:'مواقف عائلية ومغامرات كوميدية',lang:'مدبلج',a:'#2873ad',b:'#72cbd5'},
+  {id:'ben10',name:'بن 10',short:'بن 10',category:'أكشن',emoji:'⌚',desc:'مغامرات أبطال وتحولات',lang:'مدبلج',a:'#126c43',b:'#9cdc47'},
+  {id:'spongebob',name:'سبونج بوب',short:'سبونج بوب',category:'كوميديا',emoji:'🧽',desc:'كوميديا ومغامرات تحت البحر',lang:'مدبلج',a:'#b47c16',b:'#ffe05b'},
+  {id:'tomjerry',name:'توم وجيري',short:'توم وجيري',category:'كلاسيكي',emoji:'🐭',desc:'مطاردات كوميدية كلاسيكية',lang:'مدبلج',a:'#45618b',b:'#b5cae2'},
+  {id:'regularshow',name:'العرض العادي',short:'العرض العادي',category:'كوميديا',emoji:'🦝',desc:'مغامرات غريبة ومواقف مضحكة',lang:'مدبلج',a:'#234e58',b:'#6db4a0'},
+  {id:'adventuretime',name:'وقت المغامرة',short:'وقت المغامرة',category:'مغامرات',emoji:'🗡️',desc:'رحلات في أرض مليئة بالعجائب',lang:'مدبلج',a:'#277d99',b:'#a2e2a0'},
+  {id:'courage',name:'الكلب الجبان',short:'الكلب الجبان',category:'مغامرات',emoji:'🐶',desc:'مغامرات غامضة وكوميديا',lang:'مدبلج',a:'#6d3879',b:'#e28dbe'},
+  {id:'looney',name:'لوني تونز',short:'لوني تونز',category:'كلاسيكي',emoji:'🐰',desc:'رسوم متحركة كلاسيكية',lang:'مدبلج',a:'#3f477f',b:'#9b9fe6'},
+  {id:'powerpuff',name:'فتيات القوة',short:'فتيات القوة',category:'أكشن',emoji:'💥',desc:'ثلاث فتيات يحمين المدينة',lang:'مدبلج',a:'#c73b7a',b:'#f7a8c8'},
+  {id:'dexter',name:'مختبر ديكستر',short:'ديكستر',category:'كوميديا',emoji:'🧪',desc:'مخترع صغير ومغامرات علمية',lang:'مدبلج',a:'#2a6bb5',b:'#7ec8f0'},
+  {id:'johnnybravo',name:'جوني برافو',short:'جوني برافو',category:'كوميديا',emoji:'💪',desc:'فتى عضلات وكوميديا',lang:'مدبلج',a:'#e6a817',b:'#f5d76e'},
+  {id:'codename',name:'كود نيم كيدز نكست دور',short:'قطاع التسلية',category:'أكشن',emoji:'🏠',desc:'أطفال جواسيس ومهام سرية',lang:'مدبلج',a:'#3d5a80',b:'#98c1d9'},
+  {id:'samuraijack',name:'ساموراي جاك',short:'ساموراي جاك',category:'أكشن',emoji:'⚔️',desc:'محارب يسافر عبر الزمن',lang:'مدبلج',a:'#1a1a2e',b:'#e94560'},
+  {id:'generatorrex',name:'المولد ريكس',short:'ريكس',category:'أكشن',emoji:'🦾',desc:'فتى يتحكم في النانيت',lang:'مدبلج',a:'#0f4c5c',b:'#5b8c5a'},
+  {id:'teen titans',name:'أبطال التايتنز',short:'التايتنز',category:'أكشن',emoji:'🦸',desc:'فريق أبطال خارقين',lang:'مدبلج',a:'#5c4d7a',b:'#9b6b9e'},
+  {id:'stevenuniverse',name:'ستيفن يونيفرس',short:'ستيفن',category:'مغامرات',emoji:'💎',desc:'مغامرات وفنون قتالية سحرية',lang:'مدبلج',a:'#6b4c9a',b:'#e8a0bf'},
+  {id:'webarerbears',name:'نحن الدببة',short:'الدببة',category:'كوميديا',emoji:'🐻',desc:'ثلاثة دببة في المدينة',lang:'مدبلج',a:'#5d8a4d',b:'#a8d08d'},
+  {id:'clarence',name:'كلارنس',short:'كلارنس',category:'كوميديا',emoji:'😄',desc:'مغامرات طفل مرح',lang:'مدبلج',a:'#e07a3d',b:'#f5c16c'},
+  {id:'amazingworld',name:'عالم غامبول',short:'غامبول',category:'كوميديا',emoji:'🐱',desc:'نسخة مختصرة',lang:'مدبلج',a:'#2873ad',b:'#72cbd5'},
+  {id:'conan',name:'المحقق كونان',short:'كونان',category:'أنمي',emoji:'🔎',desc:'ألغاز وتحقيقات بوليسية',lang:'مدبلج',a:'#213d73',b:'#6fa0da'},
+  {id:'naruto',name:'ناروتو',short:'ناروتو',category:'أنمي',emoji:'🍥',desc:'نينجا ومهمات ومغامرات',lang:'مدبلج',a:'#a44b1f',b:'#f4ae53'},
+  {id:'narutoship',name:'ناروتو شيبودن',short:'شيبودن',category:'أنمي',emoji:'🔥',desc:'استكمال رحلة ناروتو',lang:'مدبلج',a:'#8b3a1a',b:'#e07b39'},
+  {id:'onepiece',name:'ون بيس',short:'ون بيس',category:'أنمي',emoji:'🏴‍☠️',desc:'قراصنة والبحث عن الكنز',lang:'مدبلج',a:'#1e5f8a',b:'#4db8e8'},
+  {id:'dragonball',name:'دراغون بول',short:'دراغون بول',category:'أنمي',emoji:'🐉',desc:'معارك وقوة خارقة',lang:'مدبلج',a:'#c45c26',b:'#f0a05a'},
+  {id:'dragonballz',name:'دراغون بول زد',short:'دراغون بول زد',category:'أنمي',emoji:'💥',desc:'معارك سايان الأسطورية',lang:'مدبلج',a:'#b33a1a',b:'#e8743a'},
+  {id:'bleach',name:'بليتش',short:'بليتش',category:'أنمي',emoji:'⚔️',desc:'شينيغامي وأرواح',lang:'مترجم',a:'#2c3e50',b:'#7f8c8d'},
+  {id:'deathnote',name:'دفتر الموت',short:'دفتر الموت',category:'أنمي',emoji:'📓',desc:'تكنولوجيا وذكاء وجريمة',lang:'مترجم',a:'#1a1a1a',b:'#c0392b'},
+  {id:'attackontitan',name:'هجوم العمالقة',short:'هجوم العمالقة',category:'أنمي',emoji:'🧱',desc:'صراع البقاء ضد العمالقة',lang:'مترجم',a:'#4a3728',b:'#8b6914'},
+  {id:'demonslayer',name:'قاتل الشياطين',short:'ديمون سلاير',category:'أنمي',emoji:'🩸',desc:'صائد شياطين ورحلات',lang:'مترجم',a:'#2d1b4e',b:'#e74c3c'},
+  {id:'jujutsu',name:'جوجوتسو كايسن',short:'جوجوتسو',category:'أنمي',emoji:'👊',desc:'سحر ولعنات ومعارك',lang:'مترجم',a:'#1a5276',b:'#5dade2'},
+  {id:'myhero',name:'أكاديمية بطلي',short:'ماي هيرو',category:'أنمي',emoji:'🦸‍♂️',desc:'مدرسة الأبطال الخارقين',lang:'مدبلج',a:'#27ae60',b:'#82e0aa'},
+  {id:'pokemon',name:'بوكيمون',short:'بوكيمون',category:'مغامرات',emoji:'⚡',desc:'رحلات ومخلوقات خيالية',lang:'مدبلج',a:'#b84939',b:'#f2cf60'},
+  {id:'digimon',name:'ديجيمون',short:'ديجيمون',category:'مغامرات',emoji:'👾',desc:'وحوش رقمية ومغامرات',lang:'مدبلج',a:'#2980b9',b:'#5dade2'},
+  {id:'yugioh',name:'يوغي يو',short:'يوغي',category:'أنمي',emoji:'🃏',desc:'مبارزات بالبطاقات',lang:'مدبلج',a:'#8e44ad',b:'#bb8fce'},
+  {id:'beyblade',name:'بي بليد',short:'بي بليد',category:'أكشن',emoji:'🌀',desc:'معارك البلابل',lang:'مدبلج',a:'#e67e22',b:'#f5b041'},
+  {id:'captainmajid',name:'الكابتن ماجد',short:'ماجد',category:'أنمي',emoji:'⚽',desc:'كرة قدم وطموح',lang:'مدبلج',a:'#1abc9c',b:'#76d7c4'},
+  {id:'slam dunk',name:'سلام دانك',short:'سلام دانك',category:'أنمي',emoji:'🏀',desc:'كرة سلة وشغف',lang:'مدبلج',a:'#e74c3c',b:'#f1948a'},
+  {id:'hunterxhunter',name:'هنتر × هنتر',short:'هنتر',category:'أنمي',emoji:'🎣',desc:'صيادون ومغامرات خطيرة',lang:'مترجم',a:'#27ae60',b:'#82e0aa'},
+  {id:'fullmetal',name:'الخيميائي المعدني',short:'فول ميتال',category:'أنمي',emoji:'⚗️',desc:'أخوان وبحث عن الحقيقة',lang:'مترجم',a:'#922b21',b:'#e59866'},
+  {id:'tokyo ghoul',name:'غولة طوكيو',short:'طوكيو غول',category:'أنمي',emoji:'👁️',desc:'بشر وغول في طوكيو',lang:'مترجم',a:'#1c2833',b:'#5d6d7e'},
+  {id:'onepunch',name:'رجل اللكمة الواحدة',short:'ون بنش مان',category:'أنمي',emoji:'👊',desc:'بطل يقضي على أعدائه بلكمة',lang:'مترجم',a:'#c0392b',b:'#f5b7b1'},
+  {id:'spyfamily',name:'عائلة التجسس',short:'سباي فاميلي',category:'أنمي',emoji:'🕵️',desc:'عائلة من الجواسيس',lang:'مترجم',a:'#1a5276',b:'#5dade2'},
+  {id:'shinchan',name:'شين تشان',short:'شين تشان',category:'كوميديا',emoji:'😄',desc:'مواقف كوميدية يومية',lang:'مدبلج',a:'#b44a58',b:'#f4a3a9'},
+  {id:'doraemon',name:'دورايمون',short:'دورايمون',category:'كوميديا',emoji:'🤖',desc:'قطة آلية من المستقبل',lang:'مدبلج',a:'#2980b9',b:'#85c1e9'},
+  {id:'crayon',name:'كرايون شين تشان',short:'كرايون',category:'كوميديا',emoji:'🖍️',desc:'مغامرات شين اليومية',lang:'مدبلج',a:'#e67e22',b:'#f5cba7'},
+  {id:'haikyuu',name:'هايكيو',short:'هايكيو',category:'أنمي',emoji:'🏐',desc:'كرة طائرة وطموح',lang:'مترجم',a:'#f39c12',b:'#f9e79f'},
+  {id:'blueperiod',name:'الفترة الزرقاء',short:'بلو بيريود',category:'أنمي',emoji:'🎨',desc:'فن وطموح',lang:'مترجم',a:'#1a5276',b:'#5dade2'},
+  {id:'vinlandsaga',name:'ملحمة فينلاند',short:'فينلاند',category:'أنمي',emoji:'🛡️',desc:'فايكنج وانتقام',lang:'مترجم',a:'#4a3728',b:'#a04000'},
+  {id:'chainsawman',name:'رجل المنشار',short:'تشينسو مان',category:'أنمي',emoji:'🪚',desc:'شياطين وصيادين',lang:'مترجم',a:'#922b21',b:'#e74c3c'},
+  {id:'mobpsycho',name:'موب سايكو 100',short:'موب',category:'أنمي',emoji:'👻',desc:'قوى خارقة ونمو شخصي',lang:'مترجم',a:'#1abc9c',b:'#76d7c4'},
+  {id:'blackclover',name:'بلاك كلوفر',short:'بلاك كلوفر',category:'أنمي',emoji:'🍀',desc:'سحر وطموح ليصبح إمبراطور',lang:'مدبلج',a:'#145a32',b:'#58d68d'},
+  {id:'fairytail',name:'فيري تيل',short:'فيري تيل',category:'أنمي',emoji:'✨',desc:'نقابة سحرية ومغامرات',lang:'مدبلج',a:'#6c3483',b:'#bb8fce'},
+  {id:'seven deadly',name:'الخطايا السبع المميتة',short:'الخطايا السبع',category:'أنمي',emoji:'🗡️',desc:'فرسان وممالك',lang:'مدبلج',a:'#1e8449',b:'#7dcea0'},
+  {id:'inuyasha',name:'إينوياشا',short:'إينوياشا',category:'أنمي',emoji:'🐕',desc:'شياطين وعصر الإقطاع',lang:'مدبلج',a:'#5d4e37',b:'#c4a35a'},
+  {id:'sailor moon',name:'セーラームーン / بحارة القمر',short:'بحارة القمر',category:'أنمي',emoji:'🌙',desc:'فتيات يحولن العالم',lang:'مدبلج',a:'#8e44ad',b:'#d7bde2'},
+  {id:'cardcaptor',name:'كارد كابتور ساكورا',short:'ساكورا',category:'أنمي',emoji:'🃏',desc:'فتاة تجمع البطاقات السحرية',lang:'مدبلج',a:'#e91e63',b:'#f8bbd9'}
+];
+const categories = ['الكل','كوميديا','أكشن','كلاسيكي','مغامرات','أنمي','أخرى'];
+const $ = id => document.getElementById(id);
+let currentCategory = 'الكل', favorites = new Set(), customTitles = [], videos = [], progressMap = new Map();
+let activeObjectUrl = null, activeVideoId = null, editingTitleId = null;
+window.currentPage = 'home';
+const DB_NAME = 'CartoonWorldDB', DB_VERSION = 2, VIDEO_STORE = 'videos', PROGRESS_STORE = 'progress';
+let dbPromise;
+
+function openDB(){
+  if(!('indexedDB' in window)) return Promise.reject(new Error('التخزين المحلي غير مدعوم'));
+  if(!dbPromise){
+    dbPromise = new Promise((resolve,reject)=>{
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = ()=>{
+        const db = req.result;
+        if(!db.objectStoreNames.contains(VIDEO_STORE)){
+          const s = db.createObjectStore(VIDEO_STORE,{keyPath:'id'});
+          s.createIndex('addedAt','addedAt');
+          s.createIndex('titleId','titleId');
+        }
+        if(!db.objectStoreNames.contains(PROGRESS_STORE)) db.createObjectStore(PROGRESS_STORE,{keyPath:'id'});
+      };
+      req.onsuccess = ()=>resolve(req.result);
+      req.onerror = ()=>reject(req.error || new Error('تعذر فتح قاعدة البيانات'));
+    });
+  }
+  return dbPromise;
+}
+function dbAction(store, mode, fn){
+  return openDB().then(db=>new Promise((resolve,reject)=>{
+    const tx = db.transaction(store, mode);
+    const os = tx.objectStore(store);
+    const req = fn(os);
+    if(req && req.onsuccess !== undefined){
+      req.onsuccess = ()=>resolve(req.result);
+      req.onerror = ()=>reject(req.error);
+    } else {
+      tx.oncomplete = ()=>resolve();
+      tx.onerror = ()=>reject(tx.error);
+    }
+  }));
+}
+
+function loadSettings(){
+  try{ favorites = new Set(JSON.parse(localStorage.getItem('cw4_favorites')||'[]')); }catch{ favorites = new Set(); }
+  try{ customTitles = JSON.parse(localStorage.getItem('cw4_titles')||'[]').filter(x=>x&&x.id&&x.name); }catch{ customTitles = []; }
+}
+function saveFavorites(){ try{ localStorage.setItem('cw4_favorites', JSON.stringify([...favorites])); }catch{} }
+function saveTitles(){ try{ localStorage.setItem('cw4_titles', JSON.stringify(customTitles)); }catch{ showToast('تعذر حفظ العناوين'); } }
+
+function allTitles(){ return [...defaults, ...customTitles]; }
+function titleById(id){ return allTitles().find(t=>t.id===id); }
+function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function showToast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(()=>t.classList.remove('show'), 2600);
+  if(window.CartoonWorldNative?.showToast) try{ CartoonWorldNative.showToast(msg); }catch{}
+}
+
+function goPage(name){
+  // If full player is open, switch to mini instead of losing video
+  if($('player')?.classList.contains('show') && activeVideoId){
+    closePlayer(true);
+  }
+  window.currentPage = name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el = $('page-'+name);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    n.classList.toggle('active', n.dataset.page === name);
+  });
+  if(name==='library') renderVideos();
+  if(name==='favorites') renderFavorites();
+  if(name==='stats') renderStats();
+  if(name==='home') renderHome();
+  $('content').scrollTop = 0;
+}
+
+function renderChips(){
+  $('chips').innerHTML = categories.map(c=>`<button class="chip ${c===currentCategory?'active':''}" onclick="setCategory('${c}')">${c}</button>`).join('');
+}
+function setCategory(c){ currentCategory = c; renderChips(); renderCatalog(); }
+
+function cardHtml(t, opts={}){
+  const isFav = favorites.has(t.id);
+  const vids = videos.filter(v=>v.titleId===t.id);
+  const prog = vids.length ? Math.max(...vids.map(v=>{
+    const p = progressMap.get(v.id);
+    return p && p.duration ? (p.current/p.duration) : 0;
+  })) : 0;
+  const langBadge = t.lang ? `<span class="lang-badge ${t.lang==='مدبلج'?'dub':'sub'}">${esc(t.lang)}</span>` : '';
+  return `<div class="card" onclick="openTitleEpisodes('${esc(t.id)}')">
+    <button class="fav-btn ${isFav?'on':''}" onclick="event.stopPropagation();toggleFavorite('${esc(t.id)}')">${isFav?'★':'☆'}</button>
+    <div class="card-banner" style="background:linear-gradient(135deg,${t.a||'#54377d'},${t.b||'#c95e91'})">${t.emoji||'🎬'}${langBadge}</div>
+    <div class="card-body">
+      <h4>${esc(t.short||t.name)}</h4>
+      <p>${esc(t.category)}${vids.length?` • ${vids.length} حلقة`:''}</p>
+      ${prog>0.02?`<div class="prog"><i style="width:${Math.min(100,prog*100)}%"></i></div>`:''}
+      ${opts.showActions?`<div class="card-actions">
+        <button class="btn small alt" onclick="event.stopPropagation();editTitle('${esc(t.id)}')">تعديل</button>
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+function renderCatalog(){
+  const q = ($('query')?.value||'').trim().toLowerCase();
+  let list = allTitles();
+  if(currentCategory !== 'الكل') list = list.filter(t=>t.category===currentCategory);
+  if(q) list = list.filter(t=>(t.name+t.short+t.desc+(t.lang||'')+t.category).toLowerCase().includes(q));
+  $('catalog').innerHTML = list.map(t=>cardHtml(t)).join('') || '<div class="empty"><div class="big">🔍</div>لا توجد نتائج</div>';
+  $('catalogCount').textContent = list.length;
+}
+
+function renderContinue(){
+  const items = videos.map(v=>{
+    const p = progressMap.get(v.id);
+    if(!p || !p.duration || p.current < 5 || p.current/p.duration > 0.95) return null;
+    return {v, p, ratio: p.current/p.duration};
+  }).filter(Boolean).sort((a,b)=> (b.p.updated||0)-(a.p.updated||0)).slice(0,8);
+
+  const sec = $('continueSection');
+  if(!items.length){ sec.hidden = true; return; }
+  sec.hidden = false;
+  $('continueCount').textContent = items.length;
+  $('continueGrid').innerHTML = items.map(({v,p})=>{
+    const t = titleById(v.titleId) || {emoji:'🎬', short:v.titleId, a:'#54377d', b:'#c95e91'};
+    return `<div class="card" onclick="playVideo('${esc(v.id)}')">
+      <div class="card-banner" style="background:linear-gradient(135deg,${t.a},${t.b})">${t.emoji}</div>
+      <div class="card-body">
+        <h4>${esc(v.name)}</h4>
+        <p>${esc(t.short||'')} • ${fmtTime(p.current)}</p>
+        <div class="prog"><i style="width:${Math.min(100,(p.current/p.duration)*100)}%"></i></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderHome(){
+  renderChips();
+  renderCatalog();
+  renderContinue();
+}
+
+function toggleFavorite(id){
+  if(favorites.has(id)) favorites.delete(id); else favorites.add(id);
+  saveFavorites();
+  renderHome();
+  if(window.currentPage==='favorites') renderFavorites();
+  showToast(favorites.has(id)?'أُضيف للمفضلة':'أُزيل من المفضلة');
+}
+
+function renderFavorites(){
+  const list = allTitles().filter(t=>favorites.has(t.id));
+  $('favCount').textContent = list.length;
+  $('favGrid').innerHTML = list.map(t=>cardHtml(t)).join('') || '<div class="empty"><div class="big">⭐</div>لا توجد مفضلات بعد<br>اضغط ★ على أي عنوان</div>';
+}
+
+function fillImportSelect(){
+  const sel = $('importTitle');
+  const titles = allTitles();
+  sel.innerHTML = titles.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('');
+}
+
+function openAddTitle(){
+  editingTitleId = null;
+  $('modalTitle').textContent = 'إضافة عنوان';
+  $('tName').value = '';
+  $('tShort').value = '';
+  $('tCat').value = 'أخرى';
+  $('tEmoji').value = '🎬';
+  $('tLang').value = 'مدبلج';
+  $('tDesc').value = '';
+  $('btnDeleteTitle').hidden = true;
+  $('modal').classList.add('show');
+}
+function editTitle(id){
+  const t = titleById(id);
+  if(!t || !t.custom){ showToast('العناوين الافتراضية غير قابلة للتعديل'); return; }
+  editingTitleId = id;
+  $('modalTitle').textContent = 'تعديل العنوان';
+  $('tName').value = t.name;
+  $('tShort').value = t.short||'';
+  $('tCat').value = t.category||'أخرى';
+  $('tEmoji').value = t.emoji||'🎬';
+  $('tLang').value = t.lang||'مدبلج';
+  $('tDesc').value = t.desc||'';
+  $('btnDeleteTitle').hidden = false;
+  $('modal').classList.add('show');
+}
+function closeModal(){ $('modal').classList.remove('show'); editingTitleId = null; }
+
+function saveTitle(){
+  const name = $('tName').value.trim();
+  if(!name){ showToast('اكتب اسم العنوان'); return; }
+  const short = ($('tShort').value.trim()||name).slice(0,30);
+  const category = $('tCat').value;
+  const emoji = ($('tEmoji').value.trim()||'🎬').slice(0,4);
+  const lang = $('tLang')?.value || 'مدبلج';
+  const desc = $('tDesc').value.trim().slice(0,120);
+  if(editingTitleId){
+    const idx = customTitles.findIndex(t=>t.id===editingTitleId);
+    if(idx>=0){
+      customTitles[idx] = {...customTitles[idx], name, short, category, emoji, lang, desc};
+      saveTitles();
+      showToast('تم التعديل');
+    }
+  } else {
+    const id = 'custom_'+Date.now().toString(36);
+    customTitles.push({id, name, short, category, emoji, lang, desc, a:'#54377d', b:'#c95e91', custom:true});
+    saveTitles();
+    showToast('تمت الإضافة');
+  }
+  closeModal();
+  fillImportSelect();
+  renderHome();
+  if(window.currentPage==='favorites') renderFavorites();
+}
+
+function deleteCurrentTitle(){
+  if(!editingTitleId) return;
+  if(!confirm('حذف هذا العنوان؟ لن تُحذف الحلقات المرتبطة.')) return;
+  customTitles = customTitles.filter(t=>t.id!==editingTitleId);
+  favorites.delete(editingTitleId);
+  saveTitles(); saveFavorites();
+  closeModal();
+  fillImportSelect();
+  renderHome();
+  showToast('تم الحذف');
+}
+
+function openTitleEpisodes(titleId){
+  goPage('library');
+  const sel = $('importTitle');
+  if(sel) sel.value = titleId;
+  renderVideos();
+  setTimeout(()=>$('videoList')?.scrollIntoView({behavior:'smooth',block:'start'}), 100);
+}
+
+async function chooseVideos(){
+  const titleId = $('importTitle').value;
+  if(!titleId){ showToast('اختر عنوانًا أولًا'); return; }
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'video/*';
+  input.multiple = true;
+  input.onchange = async ()=>{
+    const files = [...(input.files||[])];
+    if(!files.length) return;
+    showToast(`جاري حفظ ${files.length} ملف...`);
+    let ok = 0;
+    for(const file of files){
+      try{
+        const buf = await file.arrayBuffer();
+        const id = 'v_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+        const rec = {
+          id, titleId,
+          name: file.name.replace(/\.[^.]+$/,'').slice(0,120) || 'حلقة',
+          mime: file.type || 'video/mp4',
+          size: file.size,
+          addedAt: Date.now(),
+          blob: new Blob([buf], {type: file.type||'video/mp4'})
+        };
+        await dbAction(VIDEO_STORE, 'readwrite', os=>os.put(rec));
+        ok++;
+      }catch(e){ console.error(e); }
+    }
+    await refreshData();
+    renderVideos();
+    renderHome();
+    showToast(ok?`تم حفظ ${ok} حلقة`:'تعذر الحفظ');
+  };
+  input.click();
+}
+
+async function refreshData(){
+  try{
+    videos = await dbAction(VIDEO_STORE, 'readonly', os=>os.getAll()) || [];
+    const progs = await dbAction(PROGRESS_STORE, 'readonly', os=>os.getAll()) || [];
+    progressMap = new Map(progs.map(p=>[p.id,p]));
+  }catch(e){ console.error(e); videos = []; }
+}
+
+function formatSize(n){
+  if(n<1024) return n+' بايت';
+  if(n<1048576) return (n/1024).toFixed(1)+' ك.ب';
+  return (n/1048576).toFixed(1)+' م.ب';
+}
+function fmtTime(s){
+  s = Math.max(0, Math.floor(s||0));
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return h ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}` : `${m}:${String(sec).padStart(2,'0')}`;
+}
+
+function renderVideos(){
+  fillImportSelect();
+  const q = ($('librarySearch')?.value||'').trim().toLowerCase();
+  const titleFilter = $('importTitle')?.value;
+  let list = videos.slice().sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
+  if(titleFilter) list = list.filter(v=>v.titleId===titleFilter);
+  if(q) list = list.filter(v=>(v.name||'').toLowerCase().includes(q));
+
+  $('videoCount').textContent = list.length;
+  $('videoList').innerHTML = list.map(v=>{
+    const t = titleById(v.titleId) || {emoji:'🎬', short:'؟', a:'#54377d', b:'#c95e91'};
+    const p = progressMap.get(v.id);
+    const progTxt = p && p.duration ? `${fmtTime(p.current)} / ${fmtTime(p.duration)}` : formatSize(v.size||0);
+    return `<div class="list-item">
+      <div class="emoji" style="background:linear-gradient(135deg,${t.a},${t.b})">${t.emoji}</div>
+      <div class="meta">
+        <h4>${esc(v.name)}</h4>
+        <p>${esc(t.short)} • ${progTxt}</p>
+        ${p&&p.duration?`<div class="prog"><i style="width:${Math.min(100,(p.current/p.duration)*100)}%"></i></div>`:''}
+      </div>
+      <div class="actions">
+        <button class="btn small" onclick="playVideo('${esc(v.id)}')">▶</button>
+        <button class="btn alt small" onclick="renameVideo('${esc(v.id)}')">✎</button>
+        <button class="btn danger small" onclick="deleteStored('${esc(v.id)}')">✕</button>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty"><div class="big">📥</div>لا توجد حلقات بعد<br>اختر عنوانًا واستورد ملفات</div>';
+
+  try{
+    if(navigator.storage?.estimate){
+      navigator.storage.estimate().then(x=>{
+        $('storageState').textContent = x.quota
+          ? `المستخدم ≈ ${formatSize(x.usage||0)} من ${formatSize(x.quota)}`
+          : 'التخزين المحلي متاح';
+      }).catch(()=>{});
+    }
+  }catch{}
+}
+
+async function playVideo(id){
+  const v = videos.find(x=>x.id===id);
+  if(!v || !v.blob){ showToast('الملف غير موجود'); return; }
+  if(activeObjectUrl) URL.revokeObjectURL(activeObjectUrl);
+  activeObjectUrl = URL.createObjectURL(v.blob);
+  activeVideoId = id;
+  const vid = $('video');
+  vid.src = activeObjectUrl;
+  $('playerTitle').textContent = v.name;
+  $('player').classList.add('show');
+  if(window.CartoonWorldNative?.setKeepScreenOn) try{ CartoonWorldNative.setKeepScreenOn(true); }catch{}
+  const p = progressMap.get(id);
+  vid.onloadedmetadata = ()=>{
+    if(p && p.current > 3 && p.current < (vid.duration||0)-5){
+      vid.currentTime = p.current;
+    }
+  };
+  try{ await vid.play(); }catch{}
+}
+
+function closePlayer(toMini){
+  const vid = $('video');
+  storeCurrentProgress(true);
+  if(toMini && activeVideoId && vid.src){
+    // Switch to mini player
+    const mini = $('miniPlayer');
+    const miniVid = $('miniVideo');
+    miniVid.src = vid.src;
+    miniVid.currentTime = vid.currentTime;
+    $('miniTitle').textContent = $('playerTitle').textContent;
+    $('miniSub').textContent = 'اضغط للتوسيع';
+    $('player').classList.remove('show');
+    mini.classList.add('show');
+    if(!vid.paused){
+      miniVid.play().catch(()=>{});
+      $('miniPlayBtn').textContent = '⏸';
+    } else {
+      $('miniPlayBtn').textContent = '▶';
+    }
+    vid.pause();
+    return;
+  }
+  // Full close
+  vid.pause();
+  vid.removeAttribute('src');
+  vid.load();
+  const miniVid = $('miniVideo');
+  if(miniVid){ miniVid.pause(); miniVid.removeAttribute('src'); miniVid.load(); }
+  $('miniPlayer')?.classList.remove('show');
+  if(activeObjectUrl){ URL.revokeObjectURL(activeObjectUrl); activeObjectUrl=null; }
+  activeVideoId = null;
+  $('player').classList.remove('show');
+  if(window.CartoonWorldNative?.setKeepScreenOn) try{ CartoonWorldNative.setKeepScreenOn(false); }catch{}
+}
+
+function toggleMiniPlay(){
+  const miniVid = $('miniVideo');
+  if(!miniVid) return;
+  if(miniVid.paused){
+    miniVid.play().catch(()=>{});
+    $('miniPlayBtn').textContent = '⏸';
+  } else {
+    miniVid.pause();
+    $('miniPlayBtn').textContent = '▶';
+  }
+}
+
+function expandPlayer(){
+  const miniVid = $('miniVideo');
+  const vid = $('video');
+  if(!activeVideoId || !miniVid.src) return;
+  vid.src = miniVid.src;
+  vid.currentTime = miniVid.currentTime;
+  $('playerTitle').textContent = $('miniTitle').textContent;
+  $('miniPlayer').classList.remove('show');
+  $('player').classList.add('show');
+  if(!miniVid.paused){
+    vid.play().catch(()=>{});
+  }
+  miniVid.pause();
+  if(window.CartoonWorldNative?.setKeepScreenOn) try{ CartoonWorldNative.setKeepScreenOn(true); }catch{}
+}
+
+function closeMiniPlayer(){
+  closePlayer(false);
+}
+
+function storeCurrentProgress(force){
+  if(!activeVideoId) return;
+  const vid = $('video');
+  if(!vid.duration || isNaN(vid.duration)) return;
+  const rec = {id: activeVideoId, current: vid.currentTime, duration: vid.duration, updated: Date.now()};
+  progressMap.set(activeVideoId, rec);
+  dbAction(PROGRESS_STORE, 'readwrite', os=>os.put(rec)).catch(()=>{});
+  if(force) renderContinue();
+}
+
+async function deleteStored(id){
+  if(!confirm('حذف هذه الحلقة من المكتبة؟')) return;
+  await dbAction(VIDEO_STORE, 'readwrite', os=>os.delete(id));
+  await dbAction(PROGRESS_STORE, 'readwrite', os=>os.delete(id));
+  progressMap.delete(id);
+  await refreshData();
+  renderVideos();
+  renderHome();
+  showToast('تم الحذف');
+}
+
+function renameVideo(id){
+  const v = videos.find(x=>x.id===id);
+  if(!v) return;
+  const name = prompt('الاسم الجديد:', v.name);
+  if(name===null) return;
+  const n = name.trim().slice(0,120);
+  if(!n) return;
+  v.name = n;
+  dbAction(VIDEO_STORE, 'readwrite', os=>os.put(v)).then(()=>{
+    renderVideos();
+    showToast('تم تغيير الاسم');
+  });
+}
+
+function renderStats(){
+  $('statTitles').textContent = allTitles().length;
+  $('statVideos').textContent = videos.length;
+  $('statFavs').textContent = favorites.size;
+  let watched = 0;
+  progressMap.forEach(p=>{ if(p.current) watched += p.current; });
+  $('statWatched').textContent = Math.round(watched/60);
+}
+
+function exportBackup(){
+  const payload = {
+    app: 'CartoonWorld',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    favorites: [...favorites],
+    customTitles
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const filename = `cartoon-world-backup-${new Date().toISOString().slice(0,10)}.json`;
+  if(window.CartoonWorldNative?.saveBackup){
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const base64 = String(reader.result).split(',')[1]||'';
+      CartoonWorldNative.saveBackup(base64, filename);
+    };
+    reader.readAsDataURL(blob);
+    $('backupState').textContent = 'اختر مكان حفظ الملف...';
+    return;
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1500);
+  $('backupState').textContent = 'تم إنشاء الملف (بدون الفيديوهات)';
+  showToast('تم التصدير');
+}
+
+function shareApp(){
+  const text = 'عالم الكرتون — مكتبتك الشخصية للكرتون والأنمي على جهازك';
+  if(window.CartoonWorldNative?.shareText){
+    CartoonWorldNative.shareText('عالم الكرتون', text);
+  } else if(navigator.share){
+    navigator.share({title:'عالم الكرتون', text}).catch(()=>{});
+  } else {
+    showToast('المشاركة غير متاحة هنا');
+  }
+}
+
+async function clearAllData(){
+  if(!confirm('مسح كل العناوين المخصصة والمفضلة وسجل المشاهدة؟\n(الفيديوهات المحفوظة لن تُحذف)')) return;
+  if(!confirm('هل أنت متأكد؟ لا يمكن التراجع.')) return;
+  customTitles = [];
+  favorites = new Set();
+  saveTitles(); saveFavorites();
+  const progs = [...progressMap.keys()];
+  for(const id of progs) await dbAction(PROGRESS_STORE,'readwrite',os=>os.delete(id));
+  progressMap.clear();
+  renderHome();
+  renderStats();
+  showToast('تم مسح البيانات');
+}
+
+// Events
+$('query').addEventListener('input', ()=>{ renderCatalog(); });
+$('librarySearch').addEventListener('input', renderVideos);
+$('importTitle').addEventListener('change', renderVideos);
+$('video').addEventListener('timeupdate', ()=>storeCurrentProgress(false));
+$('video').addEventListener('pause', ()=>storeCurrentProgress(true));
+$('video').addEventListener('ended', ()=>storeCurrentProgress(true));
+$('backupPicker').addEventListener('change', async e=>{
+  const file = e.target.files?.[0];
+  e.target.value = '';
+  if(!file) return;
+  try{
+    if(file.size > 2*1024*1024) throw new Error('الملف كبير جدًا');
+    const data = JSON.parse(await file.text());
+    if(data.app!=='CartoonWorld' || !Array.isArray(data.favorites) || !Array.isArray(data.customTitles))
+      throw new Error('ملف غير مدعوم');
+    const clean = data.customTitles.filter(x=>x&&x.id&&x.name).map(x=>({
+      id: x.id.startsWith('custom_')?x.id:'custom_'+Date.now().toString(36),
+      name: String(x.name).slice(0,70),
+      short: String(x.short||x.name).slice(0,30),
+      category: categories.includes(x.category)?x.category:'أخرى',
+      emoji: String(x.emoji||'🎬').slice(0,4),
+      desc: String(x.desc||'').slice(0,120),
+      a:'#54377d', b:'#c95e91', custom:true
+    }));
+    if(!confirm(`استعادة ${clean.length} عنوان و ${data.favorites.length} مفضلة؟`)) return;
+    customTitles = clean;
+    favorites = new Set(data.favorites.filter(id=>typeof id==='string'));
+    saveTitles(); saveFavorites();
+    fillImportSelect();
+    renderHome();
+    $('backupState').textContent = 'تمت الاستعادة بنجاح';
+    showToast('تمت الاستعادة');
+  }catch(err){ showToast(err.message||'فشل الاستعادة'); }
+});
+$('modal').addEventListener('click', e=>{ if(e.target===$('modal')) closeModal(); });
+$('player').addEventListener('click', e=>{ if(e.target===$('player')) closePlayer(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closePlayer(); closeModal(); }});
+window.addEventListener('pagehide', ()=>{ if(activeVideoId) storeCurrentProgress(true); });
+
+// Init
+loadSettings();
+fillImportSelect();
+renderHome();
+refreshData().then(()=>{ renderHome(); renderVideos(); });
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

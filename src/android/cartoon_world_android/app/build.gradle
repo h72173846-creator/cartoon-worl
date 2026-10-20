@@ -1,0 +1,25 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.cartoonworld.app'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.cartoonworld.app'
+        minSdk 23
+        targetSdk 34
+        versionCode 5
+        versionName '3.1'
+    }
+    buildTypes {
+        release { minifyEnabled false }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint { abortOnError false }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+}

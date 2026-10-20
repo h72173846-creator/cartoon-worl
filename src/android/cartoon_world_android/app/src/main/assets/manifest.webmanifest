@@ -1,0 +1,11 @@
+{
+  "name": "عالم الكرتون",
+  "short_name": "عالم الكرتون",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#100b1d",
+  "theme_color": "#130d22",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
