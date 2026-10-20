@@ -1,0 +1,27 @@
+name: Dump code
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/dump.yml'
+permissions:
+  contents: write
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build dump
+        run: |
+          find src -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.java' -o -name '*.kt' -o -name '*.xml' -o -name '*.gradle' -o -name '*.json' -o -name '*.properties' -o -name '*.md' \) | sort > list.txt
+          : > all_code.txt
+          while read f; do echo "=== FILE: $f ===" >> all_code.txt; cat "$f" >> all_code.txt; echo >> all_code.txt; done < list.txt
+          echo "--- ALL FILES ---" >> all_code.txt
+          find src -type f | sort >> all_code.txt
+      - name: Commit
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add all_code.txt
+          git commit -m "Dump code" || echo none
+          git push
